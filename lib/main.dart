@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+import 'mappage.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
+Color blackshade = Color(0xFF1B1B1B);
+const Color containergrey = Color(0xFF1F2120);
 int tappedimg = -1;
 List<String> phones = [
   'Google Pixel 4a',
@@ -87,24 +89,36 @@ class _HomePageState extends State<HomePage> {
       onTap: () {
         setState(() {
           tappedimg = phnno;
-        })
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => mapPage(phnno: phnno, phnpath: phnpath)),
+          );
+        });
       },
       child: PhnContainer(
-          index: phnno, imgpath: phnpath, borderRadius: borderRadius),
+        index: phnno,
+        imgpath: phnpath,
+        borderRadius: borderRadius,
+      ),
     );
   }
 }
 
 class PhnContainer extends StatelessWidget {
-  PhnContainer({
-    Key? key,
-    required BorderRadius this.borderRadius,
-    required this.index,
-    required this.imgpath,
-  }) : super(key: key);
+  PhnContainer(
+      {Key? key,
+      required BorderRadius this.borderRadius,
+      required this.index,
+      required this.imgpath,
+      Color this.color = containergrey,
+      this.flag = false})
+      : super(key: key);
   final BorderRadius borderRadius;
   final String imgpath;
   final int index;
+  final bool flag;
+  final Color color;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -113,18 +127,25 @@ class PhnContainer extends StatelessWidget {
       height: 80,
       margin: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-          shape: BoxShape.rectangle,
-          color: Color(0xFF1F2120),
-          borderRadius: borderRadius),
-      child: Phone_Details(phnno: index, imagepath: imgpath),
+          shape: BoxShape.rectangle, color: color, borderRadius: borderRadius),
+      child: Phone_Details(
+        phnno: index,
+        imagepath: imgpath,
+        flag: tappedimg == index,
+      ),
     );
   }
 }
 
 class Phone_Details extends StatelessWidget {
-  Phone_Details({super.key, required this.phnno, required this.imagepath});
+  Phone_Details(
+      {super.key,
+      required this.phnno,
+      required this.imagepath,
+      this.flag = false});
   final String imagepath;
-  int phnno;
+  final int phnno;
+  final bool flag;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -142,9 +163,19 @@ class Phone_Details extends StatelessWidget {
             image: AssetImage(imagepath),
           ),
         ),
-        Text(
-          phones[phnno],
-          style: const TextStyle(color: Colors.white, fontSize: 23),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              phones[phnno],
+              style: const TextStyle(color: Colors.white, fontSize: 23),
+            ),
+            if (flag)
+              Text(
+                'Contacting device..',
+                style: TextStyle(color: Colors.blue),
+              )
+          ],
         ),
       ],
     );
